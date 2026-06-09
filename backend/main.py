@@ -1,9 +1,16 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 
 app = FastAPI(
     title="Movilidad México",
-    version="0.2.0"
+    version="0.3.0"
 )
+
+class Reporte(BaseModel):
+    estacion_id: int
+    direccion: str
+    mensaje: str
+    usuario: str
 
 estaciones = [
     {"id": 1, "nombre": "Buenavista", "linea_id": 1},
@@ -21,6 +28,8 @@ estaciones = [
     {"id": 13, "nombre": "Xaltocan", "linea_id": 2},
     {"id": 14, "nombre": "AIFA", "linea_id": 2}
 ]
+
+reportes = []
 
 @app.get("/")
 def root():
@@ -55,3 +64,16 @@ def obtener_estaciones_por_linea(linea_id: int):
             resultado.append(estacion)
 
     return resultado
+
+@app.post("/reportes")
+def crear_reporte(reporte: Reporte):
+    reportes.append(reporte.dict())
+
+    return {
+        "mensaje": "Reporte recibido",
+        "reporte": reporte
+    }
+
+@app.get("/reportes")
+def obtener_reportes():
+    return reportes
