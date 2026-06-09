@@ -2,8 +2,25 @@ from fastapi import FastAPI
 
 app = FastAPI(
     title="Movilidad México",
-    version="0.1.0"
+    version="0.2.0"
 )
+
+estaciones = [
+    {"id": 1, "nombre": "Buenavista", "linea_id": 1},
+    {"id": 2, "nombre": "Fortuna", "linea_id": 1},
+    {"id": 3, "nombre": "Tlalnepantla", "linea_id": 1},
+    {"id": 4, "nombre": "San Rafael", "linea_id": 1},
+    {"id": 5, "nombre": "Lechería", "linea_id": 1},
+    {"id": 6, "nombre": "Tultitlán", "linea_id": 1},
+    {"id": 7, "nombre": "Cuautitlán", "linea_id": 1},
+    {"id": 8, "nombre": "Cueyamil", "linea_id": 2},
+    {"id": 9, "nombre": "La Loma", "linea_id": 2},
+    {"id": 10, "nombre": "Teyahualco", "linea_id": 2},
+    {"id": 11, "nombre": "Prados Sur", "linea_id": 2},
+    {"id": 12, "nombre": "Cajiga", "linea_id": 2},
+    {"id": 13, "nombre": "Xaltocan", "linea_id": 2},
+    {"id": 14, "nombre": "AIFA", "linea_id": 2}
+]
 
 @app.get("/")
 def root():
@@ -15,7 +32,7 @@ def root():
 @app.get("/lineas")
 def obtener_lineas():
     return [
-        {   
+        {
             "id": 1,
             "nombre": "Buenavista - Cuautitlán"
         },
@@ -27,20 +44,14 @@ def obtener_lineas():
 
 @app.get("/estaciones")
 def obtener_estaciones():
-    return [
-        {
-            "id": 1,
-            "nombre": "Buenavista",
-            "linea_id": 1
-        },
-        {
-            "id": 2,
-            "nombre": "Fortuna",
-            "linea_id": 1
-        },
-        {
-            "id": 3,
-            "nombre": "Lechería",
-            "linea_id": 1
-        }
-    ]
+    return estaciones
+
+@app.get("/estaciones/{linea_id}")
+def obtener_estaciones_por_linea(linea_id: int):
+    resultado = []
+
+    for estacion in estaciones:
+        if estacion["linea_id"] == linea_id:
+            resultado.append(estacion)
+
+    return resultado
