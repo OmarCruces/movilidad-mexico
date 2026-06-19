@@ -7,7 +7,7 @@
 
 ## 🔖 Versión Actual
 
-**v0.1.0** — API base funcional con endpoints de líneas y estaciones.
+**v0.3.x** — API funcional con catálogo completo de estaciones, filtrado por línea y sistema de reportes con validación.
 
 ---
 
@@ -58,9 +58,16 @@
 | Python | 3.14 | Lenguaje principal |
 | FastAPI | Latest | Framework API REST |
 | Uvicorn | Latest | Servidor ASGI |
+| Pydantic | Latest | Validación de datos y modelos |
 | Git | - | Control de versiones |
 | GitHub | - | Repositorio remoto |
 | VS Code | - | Editor de código |
+
+### Planeadas para futuras versiones
+| Tecnología | Uso |
+|-----------|-----|
+| SQLAlchemy | ORM para PostgreSQL |
+| Docker | Contenerización |
 
 ### Base de datos (planeada)
 | Tecnología | Uso |
@@ -71,14 +78,14 @@
 ### Frontend (fase futura)
 | Tecnología | Uso |
 |-----------|-----|
-| Kotlin | Aplicación Android nativa |
+| Por definir (HTML/CSS/JS o framework web) | Página web interactiva con mapa, similar a amigosuburbano.com |
 
 ---
 
 ## 🏛️ Arquitectura
 
 ```
-Cliente Android (futuro)
+Cliente Web (futuro)
          │
          ▼
     [ FastAPI ]
@@ -88,7 +95,7 @@ Cliente Android (futuro)
 ```
 
 **Descripción:**
-- El cliente Android consumirá la API REST de FastAPI via HTTP.
+- El cliente web (página interactiva con mapa) consumirá la API REST de FastAPI vía HTTP.
 - FastAPI gestiona la lógica de negocio y validación de reportes.
 - PostgreSQL almacena líneas, estaciones y reportes de usuarios.
 - En desarrollo local se usa SQLite en lugar de PostgreSQL.
@@ -116,8 +123,59 @@ Lista las líneas del Tren Suburbano disponibles.
 ```
 
 ### `GET /estaciones`
-Lista las estaciones registradas.
-> ⚠️ Pendiente: agregar estaciones reales con coordenadas GPS.
+Lista todas las estaciones registradas.
+
+**Línea 1:** Buenavista · Fortuna · Tlalnepantla · San Rafael · Lechería · Tultitlán · Cuautitlán
+**Línea 2 (AIFA):** Cueyamil · La Loma · Teyahualco · Prados Sur · Cajiga · Xaltocan · AIFA
+
+> ⚠️ Pendiente: agregar coordenadas GPS reales a cada estación.
+
+### `GET /estaciones/{linea_id}`
+Filtra estaciones por línea específica.
+```
+GET /estaciones/1   → Estaciones de Buenavista-Cuautitlán
+GET /estaciones/2   → Estaciones de Cueyamil-AIFA
+```
+
+### `POST /reportes`
+Crea un nuevo reporte de paso de tren. Valida que `estacion_id` exista en el catálogo antes de aceptarlo.
+
+**Modelo (Pydantic):**
+```python
+class Reporte(BaseModel):
+    estacion_id: int
+    direccion: str
+    mensaje: str
+    usuario: str
+```
+
+**Ejemplo de petición:**
+```json
+{
+  "estacion_id": 10,
+  "direccion": "AIFA",
+  "mensaje": "Tren saliendo de Teyahualco",
+  "usuario": "Omar"
+}
+```
+
+### `GET /reportes`
+Consulta todos los reportes almacenados (actualmente en memoria, sin persistencia en BD todavía).
+
+---
+
+## 🧪 Pruebas
+
+Todos los endpoints se prueban vía Swagger/OpenAPI en `http://127.0.0.1:8000/docs`.
+
+| Prueba | Estado |
+|--------|--------|
+| Consulta de líneas | ✅ |
+| Consulta de estaciones | ✅ |
+| Filtrado por línea | ✅ |
+| Creación de reportes | ✅ |
+| Consulta de reportes | ✅ |
+| Validación de estación inexistente | ✅ |
 
 ---
 
@@ -131,33 +189,40 @@ Lista las estaciones registradas.
 - [x] Endpoint `GET /lineas` funcionando
 - [x] Endpoint `GET /estaciones` funcionando
 
-### 🔄 Fase 1 — Estabilización (En progreso)
-- [ ] Crear `.gitignore`
-- [ ] Crear repositorio en GitHub
-- [ ] Subir código al repositorio remoto
-- [ ] Agregar estaciones reales con coordenadas GPS
-- [ ] Crear `docs/proyecto.md` en el repositorio ← *este archivo*
+### ✅ Fase 1 — Estabilización (Completado)
+- [x] Crear `.gitignore`
+- [x] Crear repositorio en GitHub
+- [x] Subir código al repositorio remoto
+- [x] Crear `docs/proyecto.md`, `docs/analisis.md`, `docs/uml.md`
+- [ ] Agregar coordenadas GPS reales a las estaciones
 
-### 🔜 Fase 2 — Reportes
-- [ ] Diseñar modelo de datos para reportes
-- [ ] Integrar SQLite para desarrollo local
-- [ ] Crear endpoint `POST /reportes`
-- [ ] Crear endpoint `GET /reportes`
-- [ ] Validación básica de datos (estación válida, timestamp, dirección)
+### 🔄 Fase 2 — Reportes (En progreso)
+- [x] Diseñar modelo de datos para reportes (Pydantic)
+- [x] Crear endpoint `POST /reportes`
+- [x] Crear endpoint `GET /reportes`
+- [x] Endpoint `GET /estaciones/{linea_id}` (filtrado por línea)
+- [x] Validación: rechazar reportes de estaciones inexistentes
+- [ ] Agregar fecha y hora automática a cada reporte
+- [ ] Crear endpoint `GET /reportes/{estacion_id}`
+- [ ] Validar dirección del tren
+- [ ] Agregar identificador único (UUID) a reportes
+- [ ] Integrar SQLite para desarrollo local (persistencia actual: en memoria)
 
 ### 🔜 Fase 3 — Base de Datos Real
-- [ ] Migrar de SQLite a PostgreSQL
+- [ ] Migrar de almacenamiento en memoria a PostgreSQL
 - [ ] Definir esquema de tablas (líneas, estaciones, reportes)
-- [ ] Integrar con SQLAlchemy o Tortoise ORM
+- [ ] Integrar con SQLAlchemy
 
 ### 🔜 Fase 4 — Validación Comunitaria
 - [ ] Sistema de confirmación/rechazo de reportes
 - [ ] Lógica de validación por GPS
 - [ ] TTL (tiempo de vida) de reportes activos
+- [ ] Geolocalización de estaciones
+- [ ] Estadísticas de tráfico ferroviario
 
-### 🔜 Fase 5 — Frontend Android
-- [ ] App Android nativa en Kotlin
-- [ ] Mapa interactivo de estaciones
+### 🔜 Fase 5 — Frontend Web
+- [ ] Página web interactiva con mapa de estaciones (estilo amigosuburbano.com)
+- [ ] Reportar paso de tren tocando la estación en el mapa
 - [ ] Consumo de la API REST
 
 ---
@@ -191,7 +256,7 @@ movilidad-mexico/
 | FastAPI sobre Flask | Flask | FastAPI es más moderno, async nativo y genera docs automáticas |
 | PostgreSQL en producción | MySQL | Mejor soporte para datos geoespaciales (coordenadas GPS) |
 | SQLite en desarrollo | PostgreSQL local | Sin configuración, ideal para avanzar rápido |
-| Kotlin para Android | React Native / Flutter | App nativa, mejor rendimiento y acceso a GPS |
+| Frontend web (no app móvil) | App Android nativa | Mayor alcance sin instalación, más rápido de iterar, referencia directa: amigosuburbano.com |
 
 ---
 
@@ -213,6 +278,27 @@ movilidad-mexico/
 - Endpoint `GET /lineas` implementado.
 - Endpoint `GET /estaciones` implementado.
 - Documentación inicial `docs/proyecto.md` creada.
+
+### v0.2.0 — 2026-06-08/09
+- `.gitignore` corregido (renombrado correctamente con el punto).
+- Repositorio conectado a GitHub (`git remote add origin`).
+- Rama renombrada de `master` a `main`.
+- Primer push exitoso a GitHub.
+- `README.md` profesional agregado (Claude).
+- `docs/analisis.md` creado: requerimientos, casos de uso, historias de usuario, modelo de datos.
+- `docs/uml.md` creado: 7 diagramas Mermaid (casos de uso, clases, secuencia, ER, componentes, actividad).
+
+### v0.3.x — 2026-06-19
+- Catálogo de estaciones corregido y completado para Línea 1 y Línea AIFA.
+- Estaciones movidas a variable global reutilizable (`estaciones = []`).
+- Endpoint `GET /estaciones/{linea_id}` implementado (filtrado por línea).
+- Modelo `Reporte` creado con Pydantic.
+- Endpoint `POST /reportes` implementado.
+- Endpoint `GET /reportes` implementado (almacenamiento en memoria por ahora).
+- Validación agregada: rechaza reportes con `estacion_id` inexistente.
+- Pruebas funcionales completas vía Swagger/OpenAPI.
+- Errores resueltos: comando `uvicorn` no reconocido (solución: activar entorno virtual y usar `python -m uvicorn`), error 422 por JSON mal formado en pruebas.
+- Commit `cd1deb7`: "feat: validar existencia de estaciones en reportes" — subido a GitHub.
 
 ---
 

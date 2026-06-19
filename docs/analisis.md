@@ -62,7 +62,7 @@ Persona que utiliza el Tren Suburbano en su rutina diaria y necesita saber si ha
 | RNF-03 | Escalabilidad | Debe soportar múltiples usuarios simultáneos |
 | RNF-04 | Seguridad | No exponer datos sensibles en endpoints públicos |
 | RNF-05 | Usabilidad | La app debe ser intuitiva y de uso rápido |
-| RNF-06 | Portabilidad | Android nativo como plataforma objetivo |
+| RNF-06 | Portabilidad | Página web responsiva, accesible desde cualquier navegador |
 
 ---
 
@@ -117,7 +117,7 @@ para saber si el tren va en la dirección que necesito.
 ## 8. 🏗️ Arquitectura del Sistema
 
 ```
-[Cualquier cliente: Web, Android, iOS — fase futura]
+[Cliente Web — fase futura]
          │
          │ HTTP / REST
          ▼
@@ -135,8 +135,7 @@ para saber si el tren va en la dirección que necesito.
 | Backend | FastAPI (Python) | Lógica de negocio, validación, API REST | ✅ Actual |
 | Base de datos | PostgreSQL | Persistencia de datos | 🔜 Próxima |
 | Base de datos local | SQLite | BD ligera sin configuración | 🔜 Próxima |
-| Frontend web | Por definir | Interfaz de usuario, mapa interactivo | 🔜 Futura |
-| App Android | Kotlin | App nativa móvil | 🔜 Futura |
+| Frontend web | Por definir (estilo amigosuburbano.com) | Interfaz de usuario, mapa interactivo | 🔜 Futura |
 
 ---
 
@@ -206,7 +205,6 @@ para saber si el tren va en la dirección que necesito.
 - Historial de reportes
 - Estadísticas de uso
 - Frontend web *(fase futura)*
-- App Android nativa en Kotlin *(fase futura)*
 
 ---
 
