@@ -67,6 +67,19 @@ def obtener_estaciones_por_linea(linea_id: int):
 
 @app.post("/reportes")
 def crear_reporte(reporte: Reporte):
+
+    estacion_existe = False
+
+    for estacion in estaciones:
+        if estacion["id"] == reporte.estacion_id:
+            estacion_existe = True
+            break
+
+    if not estacion_existe:
+        return {
+            "error": "La estación no existe"
+        }
+
     reportes.append(reporte.dict())
 
     return {
