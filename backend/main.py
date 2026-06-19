@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from datetime import datetime
 
 app = FastAPI(
     title="Movilidad México",
@@ -80,11 +81,15 @@ def crear_reporte(reporte: Reporte):
             "error": "La estación no existe"
         }
 
-    reportes.append(reporte.dict())
+    nuevo_reporte = reporte.dict()
+
+    nuevo_reporte["fecha"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    reportes.append(nuevo_reporte)
 
     return {
         "mensaje": "Reporte recibido",
-        "reporte": reporte
+        "reporte": nuevo_reporte
     }
 
 @app.get("/reportes")
